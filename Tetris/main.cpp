@@ -2,6 +2,7 @@
 #include<cstdlib>
 #include<Windows.h>
 
+//constant variables
 const int HEIGHT = 24;
 const int WIDTH = 10;
 const int FPS = 100;
@@ -25,6 +26,7 @@ void clearscreen() //This is STACKOVERFLOW code Yeah but it's fast as fuck
 	SetConsoleCursorPosition(hOut, Position);
 }
 
+//update the display the current MAP
 void update() {
 	
 	std::string output_string;
@@ -45,13 +47,26 @@ void update() {
 	std::cout << output_string;
 }
 
+//this will be called every frame
+bool gameloop() {
+	
+	return false;
+}
 
+//this will be called everytime the block drops one unit
+void actOfGravity() {
+
+}
+
+//Main Function
 int main() {
 	int current_level = 0;
 	std::cout << CLOCKS_PER_SEC;	
 	while (true) {
+		actOfGravity();
 		for (int _ = 0; _ < level[current_level]; _++) {
 			Sleep(DELTA_TIME);
+			gameloop();
 			update();
 		}
 	}
