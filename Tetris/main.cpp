@@ -1,15 +1,13 @@
 #include<iostream>
 #include<cstdlib>
 #include<Windows.h>
+#include "tetris.cpp"
 
 //constant variables
 const int HEIGHT = 24;
 const int WIDTH = 10;
 const int FPS = 100;
 const int DELTA_TIME = 1000 / FPS;
-
-//I want to push this kind of information in a header file
-int level[] = { 80, 72, 64, 56, 48, 40, 32, 24, 16, 10, 8, 8, 8, 6, 6, 6, 6, 6, 6, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
 
 //Initializing a playing field of Size Height * width
 bool MAP[WIDTH][HEIGHT];
@@ -55,7 +53,11 @@ bool gameloop() {
 
 //this will be called everytime the block drops one unit
 void actOfGravity() {
-
+	int x = 6;
+	int y = 6;
+	for (int i = 0; i < 4; i++) {
+		MAP[x + tetris::piece(2, 3, i, 0)][y + tetris::piece(2, 3, i, 1)] = 1;
+	}
 }
 
 //Main Function
@@ -64,7 +66,7 @@ int main() {
 	std::cout << CLOCKS_PER_SEC;	
 	while (true) {
 		actOfGravity();
-		for (int _ = 0; _ < level[current_level]; _++) {
+		for (int _ = 0; _ < tetris::level(current_level); _++) {
 			Sleep(DELTA_TIME);
 			gameloop();
 			update();
