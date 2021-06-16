@@ -8,9 +8,35 @@ const int HEIGHT = 24;
 const int WIDTH = 10;
 const int FPS = 100;
 const int DELTA_TIME = 1000 / FPS;
+int tempcoord = 0;
 
 //Initializing a playing field of Size Height * width
-bool MAP[WIDTH][HEIGHT];
+bool STATIC_MAP[WIDTH][HEIGHT];
+bool MOVING_MAP[WIDTH][HEIGHT];
+
+
+void addPiece(int, int, int, int, bool[WIDTH][HEIGHT]);
+bool xyCheck(int, int, bool);
+
+
+class Block {
+public:
+	int x = 5;
+	int y = 0;
+	int pieceNumber = 3;
+	int rotation = 0;
+
+	bool moveDown() {
+		for (int i = 0; i < WIDTH; i++) {
+			for (int j = 0; j < HEIGHT; j++) {
+				MOVING_MAP[i][j] = 0;
+			}
+		}
+		y++;
+		addPiece(x, y, pieceNumber, rotation, MOVING_MAP);
+		return true;
+	}
+};
 
 void clearscreen() //This is STACKOVERFLOW code Yeah but it's fast as fuck
 {
@@ -25,14 +51,14 @@ void clearscreen() //This is STACKOVERFLOW code Yeah but it's fast as fuck
 }
 
 //update the display the current MAP
-void update() {
+void update(bool funcMap[WIDTH][HEIGHT], bool funcMovingMap[WIDTH][HEIGHT]) {
 	
 	std::string output_string;
 
 	for (int j = 0; j < HEIGHT; j++) {
 		output_string += "|";
 		for (int i = 0; i < WIDTH; i++) {
-			if (MAP[i][j]) {
+			if (funcMap[i][j] || funcMovingMap[i][j]) {
 				output_string += "[]";
 			}
 			else {
@@ -45,31 +71,54 @@ void update() {
 	std::cout << output_string;
 }
 
+//Update The piece in the map
+void addPiece(int x, int y, int piece, int rotation, bool funcMap[WIDTH][HEIGHT]) {
+	for (int i = 0; i < 4; i++) {
+		int coordX = x + tetris::piece(piece, rotation, i, 0);
+		int coordY = y + tetris::piece(piece, rotation, i, 1);
+		if (xyCheck(coordX, coordY, true)) {
+			funcMap[coordX][coordY] = 1;
+		}
+	}
+}
+
 //this will be called every frame
 bool gameloop() {
 	
 	return false;
 }
 
+bool xyCheck(int x, int y, bool top) {
+	if (x >= WIDTH && x < 0) {
+		return false;
+	}
+	if (y >= HEIGHT) {
+		return false;
+	}
+	if (top && y < 0) {
+		return false;
+	}
+	return true;
+}
+
+
 //this will be called everytime the block drops one unit
 void actOfGravity() {
-	int x = 6;
-	int y = 6;
-	for (int i = 0; i < 4; i++) {
-		MAP[x + tetris::piece(2, 3, i, 0)][y + tetris::piece(2, 3, i, 1)] = 1;
-	}
+
 }
 
 //Main Function
 int main() {
-	int current_level = 0;
+	int current_level = 9;
 	std::cout << CLOCKS_PER_SEC;	
+	Block block;
 	while (true) {
+		block.moveDown();
 		actOfGravity();
 		for (int _ = 0; _ < tetris::level(current_level); _++) {
 			Sleep(DELTA_TIME);
 			gameloop();
-			update();
+			update(STATIC_MAP, MOVING_MAP);
 		}
 	}
 	return 0;
