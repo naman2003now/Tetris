@@ -15,27 +15,121 @@ bool STATIC_MAP[WIDTH][HEIGHT];
 bool MOVING_MAP[WIDTH][HEIGHT];
 
 
-void addPiece(int, int, int, int, bool[WIDTH][HEIGHT]);
+bool addPiece(int, int, int, int, bool[WIDTH][HEIGHT]);
 bool xyCheck(int, int, bool);
 
 
 class Block {
 public:
-	int x = 5;
+	int x = 4;
 	int y = 0;
 	int pieceNumber = 3;
 	int rotation = 0;
 
 	bool moveDown() {
+		bool possible;
 		for (int i = 0; i < WIDTH; i++) {
 			for (int j = 0; j < HEIGHT; j++) {
 				MOVING_MAP[i][j] = 0;
 			}
 		}
 		y++;
-		addPiece(x, y, pieceNumber, rotation, MOVING_MAP);
-		return true;
+		if (addPiece(x, y, pieceNumber, rotation, MOVING_MAP)) {
+
+			return true;
+		}
+		else {
+			y--;
+			for (int i = 0; i < WIDTH; i++) {
+				for (int j = 0; j < HEIGHT; j++) {
+					MOVING_MAP[i][j] = 0;
+				}
+			}
+			addPiece(x, y, pieceNumber, rotation, MOVING_MAP);
+			return false;
+		}
 	}
+
+	bool moveLeft() {
+		bool possible;
+		for (int i = 0; i < WIDTH; i++) {
+			for (int j = 0; j < HEIGHT; j++) {
+				MOVING_MAP[i][j] = 0;
+			}
+		}
+		x++;
+		if (addPiece(x, y, pieceNumber, rotation, MOVING_MAP)) {
+
+			return true;
+		}
+		else {
+			x--;
+			for (int i = 0; i < WIDTH; i++) {
+				for (int j = 0; j < HEIGHT; j++) {
+					MOVING_MAP[i][j] = 0;
+				}
+			}
+			addPiece(x, y, pieceNumber, rotation, MOVING_MAP);
+			return false;
+		}
+	}
+
+	bool moveRight() {
+		bool possible;
+		for (int i = 0; i < WIDTH; i++) {
+			for (int j = 0; j < HEIGHT; j++) {
+				MOVING_MAP[i][j] = 0;
+			}
+		}
+		x--;
+		if (addPiece(x, y, pieceNumber, rotation, MOVING_MAP)) {
+
+			return true;
+		}
+		else {
+			x++;
+			for (int i = 0; i < WIDTH; i++) {
+				for (int j = 0; j < HEIGHT; j++) {
+					MOVING_MAP[i][j] = 0;
+				}
+			}
+			addPiece(x, y, pieceNumber, rotation, MOVING_MAP);
+			return false;
+		}
+	}
+
+	bool rotate() {
+		for (int i = 0; i < WIDTH; i++) {
+			for (int j = 0; j < HEIGHT; j++) {
+				MOVING_MAP[i][j] = 0;
+			}
+		}
+		if (rotation >= 3) {
+			rotation = 0;
+		}
+		else {
+			rotation++;
+		}
+		if (addPiece(x, y, pieceNumber, rotation, MOVING_MAP)) {
+			return true;
+		}
+		else {
+			if (rotation >= 3) {
+				rotation = 3;
+			}
+			else {
+				rotation--;
+			}
+			for (int i = 0; i < WIDTH; i++) {
+				for (int j = 0; j < HEIGHT; j++) {
+					MOVING_MAP[i][j] = 0;
+				}
+			}
+			addPiece(x, y, pieceNumber, rotation, MOVING_MAP);
+			return false;
+		}
+	}
+
 };
 
 void clearscreen() //This is STACKOVERFLOW code Yeah but it's fast as fuck
@@ -72,14 +166,19 @@ void update(bool funcMap[WIDTH][HEIGHT], bool funcMovingMap[WIDTH][HEIGHT]) {
 }
 
 //Update The piece in the map
-void addPiece(int x, int y, int piece, int rotation, bool funcMap[WIDTH][HEIGHT]) {
+bool addPiece(int x, int y, int piece, int rotation, bool funcMap[WIDTH][HEIGHT]) {
+	bool returnVariable = true;
 	for (int i = 0; i < 4; i++) {
 		int coordX = x + tetris::piece(piece, rotation, i, 0);
 		int coordY = y + tetris::piece(piece, rotation, i, 1);
 		if (xyCheck(coordX, coordY, true)) {
 			funcMap[coordX][coordY] = 1;
 		}
+		else {
+			returnVariable = false;
+		}
 	}
+	return returnVariable;
 }
 
 //this will be called every frame
