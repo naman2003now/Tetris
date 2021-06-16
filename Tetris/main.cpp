@@ -17,6 +17,7 @@ bool MOVING_MAP[WIDTH][HEIGHT];
 
 bool addPiece(int, int, int, int, bool[WIDTH][HEIGHT]);
 bool xyCheck(int, int, bool);
+bool input = false;
 
 
 class Block {
@@ -50,7 +51,7 @@ public:
 		}
 	}
 
-	bool moveLeft() {
+	bool moveRight() {
 		bool possible;
 		for (int i = 0; i < WIDTH; i++) {
 			for (int j = 0; j < HEIGHT; j++) {
@@ -74,14 +75,14 @@ public:
 		}
 	}
 
-	bool moveRight() {
+	bool moveLeft() {
 		bool possible;
 		for (int i = 0; i < WIDTH; i++) {
 			for (int j = 0; j < HEIGHT; j++) {
 				MOVING_MAP[i][j] = 0;
 			}
 		}
-		x--;
+		x = x - 1;
 		if (addPiece(x, y, pieceNumber, rotation, MOVING_MAP)) {
 
 			return true;
@@ -182,19 +183,42 @@ bool addPiece(int x, int y, int piece, int rotation, bool funcMap[WIDTH][HEIGHT]
 }
 
 //this will be called every frame
-bool gameloop() {
-	
+bool gameloop(Block &block) {
+	if (GetAsyncKeyState(VK_LEFT)) {
+		if (input) {
+			input = false;
+			block.moveLeft();
+		}
+	}
+	else if (GetAsyncKeyState(VK_RIGHT)) {
+		if (input) {
+			input = false;
+			block.moveRight();
+		}
+	}
+	else if (GetAsyncKeyState(VK_UP)) {
+		if (input) {
+			input = false;
+			block.rotate();
+		}
+	}
+	else {
+		input = true;
+	}
 	return false;
 }
 
 bool xyCheck(int x, int y, bool top) {
-	if (x >= WIDTH && x < 0) {
+	if (x >= WIDTH || x < 0) {
 		return false;
 	}
-	if (y >= HEIGHT) {
+	else if (y >= HEIGHT) {
 		return false;
 	}
-	if (top && y < 0) {
+	else if (top && y < 0) {
+		return false;
+	}
+	else if (STATIC_MAP[x][y]) {
 		return false;
 	}
 	return true;
@@ -210,15 +234,18 @@ void actOfGravity() {
 int main() {
 	int current_level = 9;
 	std::cout << CLOCKS_PER_SEC;	
-	Block block;
 	while (true) {
-		block.moveDown();
-		actOfGravity();
-		for (int _ = 0; _ < tetris::level(current_level); _++) {
-			Sleep(DELTA_TIME);
-			gameloop();
-			update(STATIC_MAP, MOVING_MAP);
+		Block block;
+		for (int steps = 0; steps < 32; steps++) {
+			block.moveDown();
+			actOfGravity();
+			for (int _ = 0; _ < tetris::level(current_level); _++) {
+				Sleep(DELTA_TIME);
+				gameloop(block);
+				update(STATIC_MAP, MOVING_MAP);
+			}
 		}
+		addPiece(block.x, block.y, block.pieceNumber, block.rotation, STATIC_MAP);
 	}
 	return 0;
 }
