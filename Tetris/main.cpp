@@ -208,6 +208,27 @@ bool gameloop(Block &block) {
 	return false;
 }
 
+int removeLine(bool funcMap[WIDTH][HEIGHT]) {
+	int numberOfLines = 0;
+	for (int i = 0; i < HEIGHT; i++) {
+		int sum = 0;
+		for (int j = 0; j < WIDTH; j++) {
+			if (funcMap[j][i]) {
+				sum ++ ;
+			}
+		}
+		if (sum == WIDTH) {
+			for (int line = i; line > 0; line--) {
+				for (int j = 0; j < WIDTH; j++) {
+					funcMap[j][line] = funcMap[j][line - 1];
+				}
+			}
+			numberOfLines++;
+		}
+	}
+	return numberOfLines;
+}
+
 bool xyCheck(int x, int y, bool top) {
 	if (x >= WIDTH || x < 0) {
 		return false;
@@ -246,6 +267,9 @@ int main() {
 			}
 		}
 		addPiece(block.x, block.y, block.pieceNumber, block.rotation, STATIC_MAP);
+		if (removeLine(STATIC_MAP)) {
+			current_level++;
+		}
 	}
 	return 0;
 }
